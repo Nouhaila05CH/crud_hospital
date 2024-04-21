@@ -28,8 +28,9 @@ def add_patient(id, gender, age, hypertension, heart_disease, ever_married, work
                                 'bmi': [bmi],
                                 'smoking_status': [smoking_status],
                                 'stroke': [stroke]})
-    data = pd.concat([data, new_patient], ignore_index=True)
+    data = pd.concat([new_patient, data], ignore_index=True)  # Add new patient as the first row
     save_data(data)
+
 
 # Function to display patient data
 def display_patients():
