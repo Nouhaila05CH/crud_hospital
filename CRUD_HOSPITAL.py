@@ -38,7 +38,7 @@ def main():
         
         if st.button("Add Patient"):
             new_patient = {"Patient ID": patient_id, "Name": name, "Age": age, "Gender": gender, "Diagnosis": diagnosis}
-            df = df.append(new_patient, ignore_index=True)
+            df = df.loc[df.index.max() + 1] = new_patient
             save_data(df)
             st.success("Patient added successfully!")
 
