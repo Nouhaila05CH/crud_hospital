@@ -4,14 +4,14 @@ import pandas as pd
 # Function to initialize or load the data
 def load_data():
     try:
-        df = pd.read_csv("hospital_patients.csv")
+        df = pd.read_csv("patients.csv")
     except FileNotFoundError:
         df = pd.DataFrame(columns=["Patient ID", "Name", "Age", "Gender", "Diagnosis"])
     return df
 
 # Function to save data to CSV file
 def save_data(df):
-    df.to_csv("hospital_patients.csv", index=False)
+    df.to_csv("patients.csv", index=False)
 
 # Main function to run the application
 def main():
