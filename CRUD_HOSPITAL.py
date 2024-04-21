@@ -1,8 +1,17 @@
 import streamlit as st
 import pandas as pd
 
-# Load initial data
-data = pd.DataFrame(columns=['id', 'gender', 'age', 'hypertension', 'heart_disease', 'ever_married', 'work_type', 'residence_type', 'avg_glucose_level', 'bmi', 'smoking_status', 'stroke'])
+# Function to load patient data from CSV
+def load_data():
+    try:
+        data = pd.read_csv("patients.csv")
+    except FileNotFoundError:
+        data = pd.DataFrame(columns=['id', 'gender', 'age', 'hypertension', 'heart_disease', 'ever_married', 'work_type', 'Residence_type', 'avg_glucose_level', 'bmi', 'smoking_status', 'stroke'])
+    return data
+
+# Function to save patient data to CSV
+def save_data(data):
+    data.to_csv("patients.csv", index=False)
 
 # Function to add a new patient
 def add_patient(id, gender, age, hypertension, heart_disease, ever_married, work_type, residence_type, avg_glucose_level, bmi, smoking_status, stroke):
@@ -14,12 +23,13 @@ def add_patient(id, gender, age, hypertension, heart_disease, ever_married, work
                                 'heart_disease': [heart_disease],
                                 'ever_married': [ever_married],
                                 'work_type': [work_type],
-                                'residence_type': [residence_type],
+                                'Residence_type': [residence_type],
                                 'avg_glucose_level': [avg_glucose_level],
                                 'bmi': [bmi],
                                 'smoking_status': [smoking_status],
                                 'stroke': [stroke]})
     data = pd.concat([data, new_patient], ignore_index=True)
+    save_data(data)
 
 # Function to display patient data
 def display_patients():
@@ -30,14 +40,19 @@ def display_patients():
 def update_patient(id, column, value):
     global data
     data.loc[data['id'] == id, column] = value
+    save_data(data)
 
 # Function to delete patient data
 def delete_patient(id):
     global data
     data = data[data['id'] != id]
+    save_data(data)
 
 # Streamlit UI
 st.title('Hospital Patients CRUD App')
+
+# Load data
+data = load_data()
 
 # Sidebar for CRUD operations
 menu = st.sidebar.selectbox('Menu', ['Add Patient', 'View Patients', 'Update Patient', 'Delete Patient'])
