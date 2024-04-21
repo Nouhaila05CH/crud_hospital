@@ -11,7 +11,7 @@ def load_data():
 
 # Function to save data to CSV file
 def save_data(df):
-    df.to_csv("patients.csv", index=False)
+    df.to_csv("hospital_patients.csv", index=False)
 
 # Main function to run the application
 def main():
