@@ -1,74 +1,84 @@
 import streamlit as st
 import pandas as pd
 
-# Function to initialize or load the data
-def load_data():
-    try:
-        df = pd.read_csv("patients.csv")
-    except FileNotFoundError:
-        df = pd.DataFrame(columns=["Patient ID", "Name", "Age", "Gender", "Diagnosis"])
-    return df
+# Load initial data
+data = pd.DataFrame(columns=['id', 'gender', 'age', 'hypertension', 'heart_disease', 'ever_married', 'work_type', 'residence_type', 'avg_glucose_level', 'bmi', 'smoking_status', 'stroke'])
 
-# Function to save data to CSV file
-def save_data(df):
-    df.to_csv("patients.csv", index=False)
+# Function to add a new patient
+def add_patient(id, gender, age, hypertension, heart_disease, ever_married, work_type, residence_type, avg_glucose_level, bmi, smoking_status, stroke):
+    global data
+    new_patient = pd.DataFrame({'id': [id],
+                                'gender': [gender],
+                                'age': [age],
+                                'hypertension': [hypertension],
+                                'heart_disease': [heart_disease],
+                                'ever_married': [ever_married],
+                                'work_type': [work_type],
+                                'residence_type': [residence_type],
+                                'avg_glucose_level': [avg_glucose_level],
+                                'bmi': [bmi],
+                                'smoking_status': [smoking_status],
+                                'stroke': [stroke]})
+    data = pd.concat([data, new_patient], ignore_index=True)
 
-# Main function to run the application
-def main():
-    st.title("Hospital Patient Management System")
+# Function to display patient data
+def display_patients():
+    global data
+    st.write(data)
+
+# Function to update patient data
+def update_patient(id, column, value):
+    global data
+    data.loc[data['id'] == id, column] = value
+
+# Function to delete patient data
+def delete_patient(id):
+    global data
+    data = data[data['id'] != id]
+
+# Streamlit UI
+st.title('Hospital Patients CRUD App')
+
+# Sidebar for CRUD operations
+menu = st.sidebar.selectbox('Menu', ['Add Patient', 'View Patients', 'Update Patient', 'Delete Patient'])
+
+if menu == 'Add Patient':
+    st.sidebar.header('Add New Patient')
+    patient_id = st.sidebar.text_input('ID')
+    gender = st.sidebar.selectbox('Gender', ['Male', 'Female', 'Other'])
+    age = st.sidebar.number_input('Age', min_value=0, max_value=150)
+    hypertension = st.sidebar.checkbox('Hypertension')
+    heart_disease = st.sidebar.checkbox('Heart Disease')
+    ever_married = st.sidebar.selectbox('Ever Married', ['Yes', 'No'])
+    work_type = st.sidebar.selectbox('Work Type', ['Private', 'Self-employed', 'Govt_job', 'Children', 'Never_worked'])
+    residence_type = st.sidebar.selectbox('Residence Type', ['Urban', 'Rural'])
+    avg_glucose_level = st.sidebar.number_input('Average Glucose Level')
+    bmi = st.sidebar.number_input('BMI')
+    smoking_status = st.sidebar.selectbox('Smoking Status', ['Smokes', 'Formerly Smoked', 'Never Smoked', 'Unknown'])
+    stroke = st.sidebar.checkbox('Stroke')
     
-    # Load data
-    df = load_data()
+    if st.sidebar.button('Add'):
+        add_patient(patient_id, gender, age, hypertension, heart_disease, ever_married, work_type, residence_type, avg_glucose_level, bmi, smoking_status, stroke)
+        st.success('Patient added successfully!')
 
-    # Display sidebar with options
-    menu = ["View Patients", "Add Patient", "Update Patient", "Delete Patient"]
-    choice = st.sidebar.selectbox("Menu", menu)
+elif menu == 'View Patients':
+    st.header('View Patients')
+    display_patients()
 
-    if choice == "View Patients":
-        st.subheader("View Patient Records")
-        st.write(df)
+elif menu == 'Update Patient':
+    st.sidebar.header('Update Patient')
+    patient_id = st.sidebar.text_input('ID')
+    column = st.sidebar.selectbox('Select Column', data.columns)
+    new_value = st.sidebar.text_input('New Value')
 
-    elif choice == "Add Patient":
-        st.subheader("Add New Patient")
-        patient_id = st.text_input("Patient ID")
-        name = st.text_input("Name")
-        age = st.number_input("Age", min_value=0, max_value=150)
-        gender = st.selectbox("Gender", ["Male", "Female"])
-        diagnosis = st.text_input("Diagnosis")
-        
-        if st.button("Add Patient"):
-            new_patient = {"Patient ID": patient_id, "Name": name, "Age": age, "Gender": gender, "Diagnosis": diagnosis}
-            df = df.loc[df.index.max() + 1] = new_patient
-            save_data(df)
-            st.success("Patient added successfully!")
+    if st.sidebar.button('Update'):
+        update_patient(patient_id, column, new_value)
+        st.success('Patient data updated successfully!')
 
-    elif choice == "Update Patient":
-        st.subheader("Update Patient Information")
-        patient_id = st.text_input("Enter Patient ID to update")
-        patient_index = df[df["Patient ID"] == patient_id].index
-        
-        if len(patient_index) > 0:
-            patient_index = patient_index[0]
-            name = st.text_input("Name", value=df.loc[patient_index, "Name"])
-            age = st.number_input("Age", min_value=0, max_value=150, value=df.loc[patient_index, "Age"])
-            gender = st.selectbox("Gender", ["Male", "Female"], index=0 if df.loc[patient_index, "Gender"] == "Male" else 1)
-            diagnosis = st.text_input("Diagnosis", value=df.loc[patient_index, "Diagnosis"])
-            
-            if st.button("Update Patient"):
-                df.loc[patient_index] = [patient_id, name, age, gender, diagnosis]
-                save_data(df)
-                st.success("Patient information updated successfully!")
-        else:
-            st.warning("Patient ID not found!")
+elif menu == 'Delete Patient':
+    st.sidebar.header('Delete Patient')
+    patient_id = st.sidebar.text_input('ID')
 
-    elif choice == "Delete Patient":
-        st.subheader("Delete Patient Record")
-        patient_id = st.text_input("Enter Patient ID to delete")
-        
-        if st.button("Delete Patient"):
-            df = df[df["Patient ID"] != patient_id]
-            save_data(df)
-            st.success("Patient record deleted successfully!")
-
-if __name__ == "__main__":
-    main()
+    if st.sidebar.button('Delete'):
+        delete_patient(patient_id)
+        st.success('Patient data deleted successfully!')
