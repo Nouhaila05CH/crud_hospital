@@ -40,14 +40,22 @@ def display_patients():
 # Function to update patient data
 def update_patient(id, column, value):
     global data
-    data.loc[data['id'] == id, column] = value
-    save_data(data)
+    if id in data['id'].values:
+        data.loc[data['id'] == id, column] = value
+        save_data(data)
+        st.success('Patient data updated successfully!')
+    else:
+        st.error('Patient ID not found.')
 
 # Function to delete patient data
 def delete_patient(id):
     global data
-    data = data[data['id'] != id]
-    save_data(data)
+    if id in data['id'].values:
+        data = data[data['id'] != id]
+        save_data(data)
+        st.success('Patient data deleted successfully!')
+    else:
+        st.error('Patient ID not found.')
 
 # Streamlit UI
 st.title('Hospital Patients CRUD App')
@@ -89,7 +97,6 @@ elif menu == 'Update Patient':
 
     if st.sidebar.button('Update'):
         update_patient(patient_id, column, new_value)
-        st.success('Patient data updated successfully!')
 
 elif menu == 'Delete Patient':
     st.sidebar.header('Delete Patient')
@@ -97,4 +104,3 @@ elif menu == 'Delete Patient':
 
     if st.sidebar.button('Delete'):
         delete_patient(patient_id)
-        st.success('Patient data deleted successfully!')
