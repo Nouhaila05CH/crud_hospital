@@ -40,12 +40,14 @@ def display_patients():
 # Function to update patient data
 def update_patient(id, column, value):
     global data
-    if id in data['id'].values:
-        data.loc[data['id'] == id, column] = value
+    id = id.strip()
+    
+    if id in data['id'].astype(str).str.strip().values:
+        data.loc[data['id'].astype(str).str.strip() == id, column] = value
         save_data(data)
         st.success('Patient data updated successfully!')
     else:
-        st.error('Patient ID not found.')
+        st.error('Patient ID not found.')
 
 # Function to delete patient data
 def delete_patient(id):
