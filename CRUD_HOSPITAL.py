@@ -1,5 +1,6 @@
 import streamlit as S
 import pandas as P
+import matplotlib.pyplot as plt
 def load_data():
     try:
         data = P.read_csv("patients.csv")
@@ -29,6 +30,15 @@ def add_patient(id, gender, age, hypertension, heart_disease, ever_married, work
 def display_patients():
     global data
     S.write(data)
+    def plot_data():
+    global data
+    plt.figure(figsize=(10, 6))
+    # Example plot: Age distribution of patients
+    plt.hist(data['age'], bins=20, color='skyblue', edgecolor='black')
+    plt.title('Age Distribution of Patients')
+    plt.xlabel('Age')
+    plt.ylabel('Frequency')
+    S.pyplot()
 def update_patient(id, column, value):
     global data
     id = id.strip()
@@ -57,7 +67,7 @@ def search_patient(id):
         S.error('Patient ID not found')
 S.title('Hospital Patients ')
 data = load_data()
-menu = S.sidebar.selectbox('Menu', ['Add Patient', 'View Patients', 'Update Patient', 'Delete Patient', 'Search Patient'])
+menu = S.sidebar.selectbox('Menu', ['Add Patient', 'View Patients', 'Update Patient', 'Delete Patient', 'Search Patient', 'Plot Data'])
 if menu == 'Add Patient':
     S.sidebar.header('Add New Patient')
     patient_id = S.sidebar.text_input('ID')
@@ -95,3 +105,6 @@ elif menu == 'Search Patient':
     patient_id = S.sidebar.text_input('ID')
     if S.sidebar.button('Search'):
         search_patient(patient_id)
+elif menu == 'Plot Data':
+    S.sidebar.header('Plot Data')
+    plot_data()
