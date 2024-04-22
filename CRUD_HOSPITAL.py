@@ -52,12 +52,13 @@ def update_patient(id, column, value):
 # Function to delete patient data
 def delete_patient(id):
     global data
-    if id in data['id'].values:
-        data = data[data['id'] != id]
+    id = id.strip()
+    if id in data['id'].astype(str).str.strip().values:
+        data = data[data['id'].astype(str).str.strip() != id]
         save_data(data)
         st.success('Patient data deleted successfully!')
     else:
-        st.error('Patient ID not found.')
+        st.error('Patient ID not found.')
 
 # Streamlit UI
 st.title('Hospital Patients CRUD App')
