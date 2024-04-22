@@ -1,17 +1,17 @@
 import streamlit as st
 import pandas as pd
 
-# Function to load patient data from CSV
+# Function to load patient data
 def load_data():
     try:
         data = pd.read_csv("patients.csv")
-        print("Data loaded successfully.")
+        st.write("Data loaded successfully.")
     except FileNotFoundError:
         data = pd.DataFrame(columns=['id', 'gender', 'age', 'hypertension', 'heart_disease', 'ever_married', 'work_type', 'Residence_type', 'avg_glucose_level', 'bmi', 'smoking_status', 'stroke'])
-        print("No data file found. Created an empty DataFrame.")
+        st.write("No data file found. Created an empty DataFrame.")
     return data
 
-# Function to save patient data to CSV
+# Function to save patient data
 def save_data(data):
     data.to_csv("patients.csv", index=False)
 
@@ -30,11 +30,10 @@ def add_patient(id, gender, age, hypertension, heart_disease, ever_married, work
                                 'bmi': [bmi],
                                 'smoking_status': [smoking_status],
                                 'stroke': [stroke]})
-    data = pd.concat([new_patient, data], ignore_index=True)  # Add new patient as the first row
+    data = pd.concat([new_patient, data], ignore_index=True)  
     save_data(data)
 
-
-# Function to display patient data
+# Function to display all patients
 def display_patients():
     global data
     st.write(data)
@@ -43,15 +42,14 @@ def display_patients():
 def update_patient(id, column, value):
     global data
     id = id.strip()
-    
     if id in data['id'].astype(str).str.strip().values:
         data.loc[data['id'].astype(str).str.strip() == id, column] = value
         save_data(data)
         st.success('Patient data updated successfully!')
     else:
-        st.error('Patient ID not found.')
+        st.error('Patient ID not found.')
 
-# Function to delete patient data
+# Function to delete a patient
 def delete_patient(id):
     global data
     id = id.strip()
@@ -60,17 +58,24 @@ def delete_patient(id):
         save_data(data)
         st.success('Patient data deleted successfully!')
     else:
-        st.error('Patient ID not found.')
+        st.error('Patient ID not found.')
 
-# Streamlit UI
+# Function to search for a patient
+def search_patient(id):
+    global data
+    id = id.strip()
+    if id in data['id'].astype(str).str.strip().values:
+        patient = data[data['id'].astype(str).str.strip() == id]
+        st.write(patient)
+    else:
+        st.error('Patient ID not found.')
+
+# Streamlit interface
 st.title('Hospital Patients CRUD App')
-
-# Load data
 data = load_data()
+menu = st.sidebar.selectbox('Menu', ['Add Patient', 'View Patients', 'Update Patient', 'Delete Patient', 'Search Patient'])
 
-# Sidebar for CRUD operations
-menu = st.sidebar.selectbox('Menu', ['Add Patient', 'View Patients', 'Update Patient', 'Delete Patient'])
-
+# Menu options
 if menu == 'Add Patient':
     st.sidebar.header('Add New Patient')
     patient_id = st.sidebar.text_input('ID')
@@ -85,7 +90,6 @@ if menu == 'Add Patient':
     bmi = st.sidebar.number_input('BMI')
     smoking_status = st.sidebar.selectbox('Smoking Status', ['Smokes', 'Formerly Smoked', 'Never Smoked', 'Unknown'])
     stroke = st.sidebar.checkbox('Stroke')
-    
     if st.sidebar.button('Add'):
         add_patient(patient_id, gender, age, hypertension, heart_disease, ever_married, work_type, residence_type, avg_glucose_level, bmi, smoking_status, stroke)
         st.success('Patient added successfully!')
@@ -99,13 +103,17 @@ elif menu == 'Update Patient':
     patient_id = st.sidebar.text_input('ID')
     column = st.sidebar.selectbox('Select Column', data.columns)
     new_value = st.sidebar.text_input('New Value')
-
     if st.sidebar.button('Update'):
         update_patient(patient_id, column, new_value)
 
 elif menu == 'Delete Patient':
     st.sidebar.header('Delete Patient')
     patient_id = st.sidebar.text_input('ID')
-
     if st.sidebar.button('Delete'):
         delete_patient(patient_id)
+
+elif menu == 'Search Patient':
+    st.sidebar.header('Search Patient')
+    patient_id = st.sidebar.text_input('ID')
+    if st.sidebar.button('Search'):
+        search_patient(patient_id)
