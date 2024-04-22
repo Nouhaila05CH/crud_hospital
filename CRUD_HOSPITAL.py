@@ -5,8 +5,10 @@ import pandas as pd
 def load_data():
     try:
         data = pd.read_csv("patients.csv")
+        print("Data loaded successfully.")
     except FileNotFoundError:
         data = pd.DataFrame(columns=['id', 'gender', 'age', 'hypertension', 'heart_disease', 'ever_married', 'work_type', 'Residence_type', 'avg_glucose_level', 'bmi', 'smoking_status', 'stroke'])
+        print("No data file found. Created an empty DataFrame.")
     return data
 
 # Function to save patient data to CSV
