@@ -2,12 +2,14 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# Global variable for data
+data = pd.DataFrame(columns=['id', 'gender', 'age', 'hypertension', 'heart_disease', 'ever_married', 'work_type', 'residence_type', 'avg_glucose_level', 'bmi', 'smoking_status', 'stroke'])
+
 def load_data():
     try:
         data = pd.read_csv("patients.csv")
         st.write("Données chargées avec succès")
     except FileNotFoundError:
-        data = pd.DataFrame(columns=['id', 'gender', 'age', 'hypertension', 'heart_disease', 'ever_married', 'work_type', 'residence_type', 'avg_glucose_level', 'bmi', 'smoking_status', 'stroke'])
         st.write("Aucun fichier de données trouvé")
     return data
 
@@ -15,6 +17,7 @@ def save_data(data):
     data.to_csv("patients.csv", index=False)
 
 def add_patient():
+    global data
     st.sidebar.header('Ajouter un nouveau patient')
     id = st.sidebar.text_input('ID')
     gender = st.sidebar.radio('Genre', ['Male', 'Female', 'Other'])
@@ -41,7 +44,7 @@ def add_patient():
                                     'bmi': [bmi],
                                     'smoking_status': [smoking_status],
                                     'stroke': [stroke]})
-        data = pd.concat([new_patient, load_data()], ignore_index=True)  
+        data = pd.concat([new_patient, data], ignore_index=True)  
         save_data(data)
         st.success('Patient ajouté avec succès')
 
@@ -50,6 +53,7 @@ def display_patients():
     st.write(load_data())
 
 def update_patient():
+    global data
     st.sidebar.header('Mettre à jour le patient')
     patient_id = st.sidebar.text_input('ID')
     column = st.sidebar.selectbox('Sélectionner la colonne', data.columns)
@@ -63,6 +67,7 @@ def update_patient():
             st.error('ID du patient introuvable')
 
 def delete_patient():
+    global data
     st.sidebar.header('Supprimer le patient')
     patient_id = st.sidebar.text_input('ID')
     if st.sidebar.button('Supprimer'):
