@@ -1,11 +1,5 @@
 import streamlit as S
 import pandas as P
-def login():
-    S.title('Login')
-    username = S.text_input('Username')
-    password = S.text_input('Password', type='password')
-    if username == 'admin' and password == 'password':  # À remplacer par vos propres identifiants sécurisés
-        S.success('Logged in successfully!')
 def load_data():
     try:
         data = P.read_csv("patients.csv")
