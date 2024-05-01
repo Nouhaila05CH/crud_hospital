@@ -10,6 +10,12 @@ def load_data():
     return data
 def save_data(data):
     data.to_csv("patients.csv", index=False)
+def login():
+    S.title('Login')
+    username = S.text_input('Username')
+    password = S.text_input('Password', type='password')
+    if username == 'admin' and password == 'password':  # À remplacer par vos propres identifiants sécurisés
+        S.success('Logged in successfully!')
 def add_patient(id, gender, age, hypertension, heart_disease, ever_married, work_type, residence_type, avg_glucose_level, bmi, smoking_status, stroke):
     global data
     new_patient = P.DataFrame({'id': [id],
@@ -55,6 +61,7 @@ def search_patient(id):
         S.write(patient)
     else:
         S.error('Patient ID not found')
+
 S.title('Hospital Patients ')
 data = load_data()
 menu = S.sidebar.selectbox('Menu', ['Add Patient', 'View Patients', 'Update Patient', 'Delete Patient', 'Search Patient'])
