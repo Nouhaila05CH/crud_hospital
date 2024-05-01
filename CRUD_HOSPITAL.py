@@ -1,5 +1,6 @@
 import streamlit as S
 import pandas as P
+import matplotlib.pyplot as plt
 def load_data():
     try:
         data = P.read_csv("patients.csv")
