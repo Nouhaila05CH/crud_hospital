@@ -120,8 +120,9 @@ elif menu == 'Search Patient':
     if S.sidebar.button('Search'):
         search_patient(patient_id)
 elif menu == 'Visualize Hypertension':
-        visualize_hypertension(data)
-    elif menu == 'Visualize Heart Disease':
-        visualize_heart_disease(data)
-    elif menu == 'Visualize Smoking Status':
-        visualize_smoking_status(data)
+    visualize_hypertension(data)
+elif menu == 'Visualize Heart Disease':
+    visualize_heart_disease(data)
+elif menu == 'Visualize Smoking Status':
+    visualize_smoking_status(data)
+
