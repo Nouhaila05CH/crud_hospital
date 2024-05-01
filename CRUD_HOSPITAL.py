@@ -55,7 +55,29 @@ def search_patient(id):
         S.write(patient)
     else:
         S.error('Patient ID not found')
+# Visualisation de l'hypertension
+def visualize_hypertension(data):
+    hypertension_counts = data['hypertension'].value_counts()
+    plt.figure(figsize=(6, 6))
+    S.subheader('Hypertension Distribution')
+    S.pyplot(plt.pie(hypertension_counts, labels=hypertension_counts.index, autopct='%1.1f%%', startangle=140))
+    S.write(hypertension_counts)
 
+# Visualisation des maladies cardiaques
+def visualize_heart_disease(data):
+    heart_disease_counts = data['heart_disease'].value_counts()
+    plt.figure(figsize=(6, 6))
+    S.subheader('Heart Disease Distribution')
+    S.pyplot(plt.pie(heart_disease_counts, labels=heart_disease_counts.index, autopct='%1.1f%%', startangle=140))
+    S.write(heart_disease_counts)
+
+# Visualisation du statut de tabagisme
+def visualize_smoking_status(data):
+    smoking_status_counts = data['smoking_status'].value_counts()
+    plt.figure(figsize=(10, 6))
+    S.subheader('Smoking Status Distribution')
+    S.bar_chart(smoking_status_counts)
+    S.write(smoking_status_counts)
 S.title('Hospital Patients ')
 data = load_data()
 menu = S.sidebar.selectbox('Menu', ['Add Patient', 'View Patients', 'Update Patient', 'Delete Patient', 'Search Patient'])
@@ -96,3 +118,9 @@ elif menu == 'Search Patient':
     patient_id = S.sidebar.text_input('ID')
     if S.sidebar.button('Search'):
         search_patient(patient_id)
+elif menu == 'Visualize Hypertension':
+        visualize_hypertension(data)
+    elif menu == 'Visualize Heart Disease':
+        visualize_heart_disease(data)
+    elif menu == 'Visualize Smoking Status':
+        visualize_smoking_status(data)
