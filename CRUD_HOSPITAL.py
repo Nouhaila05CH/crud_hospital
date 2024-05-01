@@ -1,133 +1,113 @@
-import streamlit as S
-import pandas as P
+import streamlit as st
+import pandas as pd
 
-# Fonction pour charger les données
+# Function to load data
 def load_data():
     try:
-        data = P.read_csv("patients.csv")
-        S.write("Données chargées avec succès")
+        data = pd.read_csv("patients.csv")
+        st.write("Data loaded successfully")
     except FileNotFoundError:
-        data = P.DataFrame(columns=['id', 'gender', 'age', 'hypertension', 'heart_disease', 'ever_married', 'work_type', 'Residence_type', 'avg_glucose_level', 'bmi', 'smoking_status', 'stroke'])
-        S.write("Aucun fichier de données trouvé")
+        data = pd.DataFrame(columns=['id', 'gender', 'age', 'hypertension', 'heart_disease', 'ever_married', 'work_type', 'residence_type', 'avg_glucose_level', 'bmi', 'smoking_status', 'stroke'])
+        st.write("No data file found")
     return data
 
-# Fonction pour sauvegarder les données
+# Function to save data
 def save_data(data):
     data.to_csv("patients.csv", index=False)
 
-# Fonction pour ajouter un patient
-def add_patient(id, gender, age, hypertension, heart_disease, ever_married, work_type, residence_type, avg_glucose_level, bmi, smoking_status, stroke):
-    global data
-    new_patient = P.DataFrame({'id': [id],
-                                'gender': [gender],
-                                'age': [age],
-                                'hypertension': [hypertension],
-                                'heart_disease': [heart_disease],
-                                'ever_married': [ever_married],
-                                'work_type': [work_type],
-                                'Residence_type': [residence_type],
-                                'avg_glucose_level': [avg_glucose_level],
-                                'bmi': [bmi],
-                                'smoking_status': [smoking_status],
-                                'stroke': [stroke]})
-    data = P.concat([new_patient, data], ignore_index=True)  
+# Function to add a patient
+def add_patient(patient_data):
+    data = load_data()
+    data = pd.concat([patient_data, data], ignore_index=True)
     save_data(data)
+    st.success('Patient added successfully')
 
-# Fonction pour afficher les patients
+# Function to display patients
 def display_patients():
-    global data
-    S.write(data)
+    data = load_data()
+    st.write(data)
 
-# Fonction pour mettre à jour les informations d'un patient
+# Function to update patient information
 def update_patient(id, column, value):
-    global data
+    data = load_data()
     id = id.strip()
     if id in data['id'].astype(str).str.strip().values:
         data.loc[data['id'].astype(str).str.strip() == id, column] = value
         save_data(data)
-        S.success('Informations du patient mises à jour avec succès')
+        st.success('Patient information updated successfully')
     else:
-        S.error('Identifiant du patient non trouvé')
+        st.error('Patient ID not found')
 
-# Fonction pour supprimer un patient
+# Function to delete a patient
 def delete_patient(id):
-    global data
+    data = load_data()
     id = id.strip()
     if id in data['id'].astype(str).str.strip().values:
         data = data[data['id'].astype(str).str.strip() != id]
         save_data(data)
-        S.success('Informations du patient supprimées avec succès')
+        st.success('Patient information deleted successfully')
     else:
-        S.error('Identifiant du patient non trouvé')
+        st.error('Patient ID not found')
 
-# Fonction pour rechercher un patient
+# Function to search for a patient
 def search_patient(id):
-    global data
+    data = load_data()
     id = id.strip()
     if id in data['id'].astype(str).str.strip().values:
         patient = data[data['id'].astype(str).str.strip() == id]
-        S.write(patient)
+        st.write(patient)
     else:
-        S.error('Identifiant du patient non trouvé')
+        st.error('Patient ID not found')
 
-# Fonction de connexion
-def login():
-    S.title("Connexion")
-    username = S.text_input("Nom d'utilisateur")
-    password = S.text_input("Mot de passe", type="password")
-    if S.button("Se connecter"):
-        # Valider les informations de connexion
-        if username == "admin" and password == "password":
-            S.success("Connexion réussie")
-            return True
-        else:
-            S.error("Nom d'utilisateur ou mot de passe incorrect")
-
-# Fonction principale de l'application
+# Main function of the application
 def main():
-    if login():
-        # Les utilisateurs sont connectés, afficher le menu principal
-        S.title('Patients de l\'hôpital')
-        data = load_data()
-        menu = S.sidebar.selectbox('Menu', ['Ajouter un patient', 'Afficher les patients', 'Mettre à jour un patient', 'Supprimer un patient', 'Rechercher un patient'])
-        if menu == 'Ajouter un patient':
-            S.sidebar.header('Ajouter un nouveau patient')
-            patient_id = S.sidebar.text_input('ID')
-            gender = S.sidebar.selectbox('Genre', ['Masculin', 'Féminin', 'Autre'])
-            age = S.sidebar.number_input('Âge', min_value=0, max_value=150)
-            hypertension = S.sidebar.checkbox('Hypertension')
-            heart_disease = S.sidebar.checkbox('Maladie cardiaque')
-            ever_married = S.sidebar.selectbox('Déjà marié', ['Oui', 'Non'])
-            work_type = S.sidebar.selectbox('Type de travail', ['Privé', 'Indépendant', 'Emploi gouvernemental', 'Enfants', 'Jamais travaillé'])
-            residence_type = S.sidebar.selectbox('Type de résidence', ['Urbain', 'Rural'])
-            avg_glucose_level = S.sidebar.number_input('Niveau de glucose moyen')
-            bmi = S.sidebar.number_input('IMC')
-            smoking_status = S.sidebar.selectbox('Statut de fumeur', ['Fume', 'A arrêté de fumer', 'N\'a jamais fumé', 'Inconnu'])
-            stroke = S.sidebar.checkbox('AVC')
-            if S.sidebar.button('Ajouter'):
-                add_patient(patient_id, gender, age, hypertension, heart_disease, ever_married, work_type, residence_type, avg_glucose_level, bmi, smoking_status, stroke)
-                S.success('Patient ajouté avec succès')
-        elif menu == 'Afficher les patients':
-            S.header('Afficher les patients')
-            display_patients()
-        elif menu == 'Mettre à jour un patient':
-            S.sidebar.header('Mettre à jour un patient')
-            patient_id = S.sidebar.text_input('ID')
-            column = S.sidebar.selectbox('Sélectionner une colonne', data.columns)
-            new_value = S.sidebar.text_input('Nouvelle valeur')
-            if S.sidebar.button('Mettre à jour'):
-                update_patient(patient_id, column, new_value)
-        elif menu == 'Supprimer un patient':
-            S.sidebar.header('Supprimer un patient')
-            patient_id = S.sidebar.text_input('ID')
-            if S.sidebar.button('Supprimer'):
-                delete_patient(patient_id)
-        elif menu == 'Rechercher un patient':
-            S.sidebar.header('Rechercher un patient')
-            patient_id = S.sidebar.text_input('ID')
-            if S.sidebar.button('Rechercher'):
-                search_patient(patient_id)
+    st.title('Hospital Patients')
 
-# Appel de la fonction principale
+    menu = st.sidebar.selectbox('Menu', ['Add Patient', 'Display Patients', 'Update Patient', 'Delete Patient', 'Search Patient'])
+
+    if menu == 'Add Patient':
+        st.sidebar.header('Add a New Patient')
+        patient_id = st.sidebar.text_input('ID')
+        gender = st.sidebar.selectbox('Gender', ['Male', 'Female', 'Other'])
+        age = st.sidebar.number_input('Age', min_value=0, max_value=150)
+        hypertension = st.sidebar.checkbox('Hypertension')
+        heart_disease = st.sidebar.checkbox('Heart Disease')
+        ever_married = st.sidebar.selectbox('Ever Married', ['Yes', 'No'])
+        work_type = st.sidebar.selectbox('Work Type', ['Private', 'Self-employed', 'Govt_job', 'Children', 'Never_worked'])
+        residence_type = st.sidebar.selectbox('Residence Type', ['Urban', 'Rural'])
+        avg_glucose_level = st.sidebar.number_input('Average Glucose Level')
+        bmi = st.sidebar.number_input('BMI')
+        smoking_status = st.sidebar.selectbox('Smoking Status', ['Smokes', 'Formerly Smoked', 'Never Smoked', 'Unknown'])
+        stroke = st.sidebar.checkbox('Stroke')
+
+        if st.sidebar.button('Add'):
+            patient_data = pd.DataFrame({'id': [patient_id], 'gender': [gender], 'age': [age], 'hypertension': [hypertension], 'heart_disease': [heart_disease], 'ever_married': [ever_married], 'work_type': [work_type], 'residence_type': [residence_type], 'avg_glucose_level': [avg_glucose_level], 'bmi': [bmi], 'smoking_status': [smoking_status], 'stroke': [stroke]})
+            add_patient(patient_data)
+
+    elif menu == 'Display Patients':
+        st.header('Display Patients')
+        display_patients()
+
+    elif menu == 'Update Patient':
+        st.sidebar.header('Update Patient')
+        patient_id = st.sidebar.text_input('ID')
+        column = st.sidebar.selectbox('Select Column', ['gender', 'age', 'hypertension', 'heart_disease', 'ever_married', 'work_type', 'residence_type', 'avg_glucose_level', 'bmi', 'smoking_status', 'stroke'])
+        new_value = st.sidebar.text_input('New Value')
+        if st.sidebar.button('Update'):
+            update_patient(patient_id, column, new_value)
+
+    elif menu == 'Delete Patient':
+        st.sidebar.header('Delete Patient')
+        patient_id = st.sidebar.text_input('ID')
+        if st.sidebar.button('Delete'):
+            delete_patient(patient_id)
+
+    elif menu == 'Search Patient':
+        st.sidebar.header('Search Patient')
+        patient_id = st.sidebar.text_input('ID')
+        if st.sidebar.button('Search'):
+            search_patient(patient_id)
+
+# Call the main function
 if __name__ == "__main__":
     main()
